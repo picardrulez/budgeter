@@ -207,9 +207,12 @@ func templateList() []TemplateItem {
 	var name string
 	var amount int
 	var date int
+	var website string
+	var username string
+	var password string
 
 	for rows.Next() {
-		err = rows.Scan(&name, &amount, &date)
+		err = rows.Scan(&name, &amount, &date, &website, &username, &password)
 		if err != nil {
 			log.Println("eror scanning rows")
 			log.Printf("%s", err)
@@ -217,7 +220,7 @@ func templateList() []TemplateItem {
 			db.Close()
 			return templatereturn
 		}
-		thisitem := TemplateItem{Name: name, Amount: amount, Date: date}
+		thisitem := TemplateItem{Name: name, Amount: amount, Date: date, Website: website, Username: username, Password: password}
 		templatereturn = append(templatereturn, thisitem)
 	}
 	rows.Close()
@@ -225,7 +228,7 @@ func templateList() []TemplateItem {
 	return templatereturn
 }
 
-func addToTemplate(name string, amount int, date int) int {
+func addToTemplate(templateitem TemplateItem) int {
 	db, err := sql.Open("sqlite3", "./budget.db")
 	if err != nil {
 		log.Println("error opening db for insert")
@@ -233,14 +236,14 @@ func addToTemplate(name string, amount int, date int) int {
 		db.Close()
 		return 1
 	}
-	stmt, err := db.Prepare("INSERT INTO template(name, amount, date) values(?,?,?)")
+	stmt, err := db.Prepare("INSERT INTO template(name, amount, date, website, username, password) values(?,?,?,?,?,?)")
 	if err != nil {
 		log.Println("error preparing insert statemnt")
 		log.Printf("%s", err)
 		db.Close()
 		return 2
 	}
-	_, err = stmt.Exec(name, amount, date)
+	_, err = stmt.Exec(templateitem.Name, templateitem.Amount, templateitem.Date, templateitem.Website, templateitem.Username, templateitem.Password)
 	if err != nil {
 		log.Println("error executing insert statemtnt")
 		log.Printf("%s", err)
@@ -251,7 +254,7 @@ func addToTemplate(name string, amount int, date int) int {
 	return 0
 }
 
-func updateTemplate(name string, amount int, date int) int {
+func updateTemplate(templateitem TemplateItem) int {
 	db, err := sql.Open("sqlite3", "./budget.db")
 	if err != nil {
 		log.Println("error opening db for insert")
@@ -259,7 +262,7 @@ func updateTemplate(name string, amount int, date int) int {
 		db.Close()
 		return 1
 	}
-	stmt, err := db.Prepare("update template set amount=?, date=? where name=?")
+	stmt, err := db.Prepare("update template set amount=?, date=?, website=?, username=?, password=? where name=?")
 	if err != nil {
 		log.Println("error preparing")
 		log.Printf("%s", err)
@@ -267,7 +270,7 @@ func updateTemplate(name string, amount int, date int) int {
 		return 2
 	}
 
-	res, err := stmt.Exec(amount, date, name)
+	res, err := stmt.Exec(templateitem.Amount, templateitem.Date, templateitem.Website, templateitem.Username, templateitem.Password, templateitem.Name)
 	if err != nil {
 		log.Println("error updating")
 		log.Printf("%s", err)

@@ -8,9 +8,12 @@ import (
 )
 
 type TemplateItem struct {
-	Name   string
-	Amount int
-	Date   int
+	Name     string
+	Amount   int
+	Date     int
+	Website  string
+	Username string
+	Password string
 }
 
 func viewTemplateHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,10 +21,10 @@ func viewTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	content := `
 	<h1>Template</h1>
 	<br/>
-	<table><tr><td>Name</td><td>Amount</td><td>Date</td></tr>
+	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td></tr>
 	`
 	for _, k := range templateArray {
-		content = content + "<tr><td>" + k.Name + "</td><td>" + strconv.Itoa(k.Amount) + "</td><td>" + strconv.Itoa(k.Date) + "</td></tr>"
+		content = content + "<tr><td>" + k.Name + "</td><td>" + strconv.Itoa(k.Amount) + "</td><td>" + strconv.Itoa(k.Date) + "</td><td>" + k.Website + "</td><td>" + k.Username + "</td><td>" + k.Password + "</td></tr>"
 	}
 	content = content + "</table>"
 	content = content + `
@@ -32,6 +35,12 @@ func viewTemplateHandler(w http.ResponseWriter, r *http.Request) {
 		<input type="text" size="5" id="amount" name="amount">
 		<label for="date">Date</label>
 		<input type="text" size="5" id="date" name="date">
+		<label for="website">Website</label>
+		<input type="text" size="20" id="website" name="website">
+		<label for="username">Username</label>
+		<input type="text" size="20" id="username" name="username">
+		<label for="password">Password</label>
+		<input type="text" size="20" id="password" name="password">
 		<button type="submit">Add</button>
 	</form>
 	`
@@ -44,8 +53,12 @@ func addtotemplateHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	amount, _ := strconv.Atoi(r.FormValue("amount"))
 	date, _ := strconv.Atoi(r.FormValue("date"))
+	website := r.FormValue("website")
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	templateitem := TemplateItem{Name: name, Amount: amount, Date: date, Website: website, Username: username, Password: password}
 	if userName != "" {
-		res := addToTemplate(name, amount, date)
+		res := addToTemplate(templateitem)
 		if res != 0 {
 			io.WriteString(w, "an erro roccured adding item")
 		}
@@ -60,14 +73,17 @@ func editTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	content := `
 	<h1>Edit Template</h1>
 	<br/>
-	<table><tr><td>Name</td><td>Amount</td><td>Date<td></tr>
+	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td></tr>
 	`
 	for _, k := range templateArray {
-		content = content + "</tr><td>" + k.Name + `</td><td>
+		content = content + "<tr><td>" + k.Name + `</td><td>
 	<FORM METHOD="post" action="/edittemplateprocessor">
 	<input type="hidden" name="name" value="` + k.Name + `">
 		<input type="text" size="5" id="amount" name="amount" value="` + strconv.Itoa(k.Amount) + `"></td><td>
 		<input type="text" size="5" id="date" name="date" value="` + strconv.Itoa(k.Date) + `"></td><td>
+		<input type="text" size="15" id="website" name="website" value="` + k.Website + `"></td><td>
+		<input type="text" size="15" id="username" name="username" value="` + k.Username + `"></td><td>
+		<input type="text" size="15" id="password" name="password" value="` + k.Password + `"></td><td>
 		<button type="submit">Submit</button>
 		</form></td><td>
 		<FORM METHOD="post" action="/deletetemplateprocessor">
@@ -88,8 +104,12 @@ func edittemplateprocessor(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	amount, _ := strconv.Atoi(r.FormValue("amount"))
 	date, _ := strconv.Atoi(r.FormValue("date"))
+	website := r.FormValue("website")
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	templateitem := TemplateItem{Name: name, Amount: amount, Date: date, Website: website, Username: username, Password: password}
 	if userName != "" {
-		res := updateTemplate(name, amount, date)
+		res := updateTemplate(templateitem)
 		if res != 0 {
 			io.WriteString(w, "an error occured updating item "+name)
 		}

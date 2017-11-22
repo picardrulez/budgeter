@@ -16,7 +16,7 @@ func startup() int {
 	}
 	usersTableCreate.Exec()
 
-	templateTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS template (name TEXT, amount INT, date INT)")
+	templateTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS template (name TEXT, amount INT, date INT, website TEXT, username TEXT, password TEXT)")
 	if err != nil {
 		log.Println("error preparing create template table statement")
 		log.Printf("%s", err)
