@@ -24,7 +24,7 @@ func startup() int {
 	}
 	templateTableCreate.Exec()
 
-	settingsTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS settings (periodlength INT, periodformat STRING, startdate DATETIME, )")
+	settingsTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS settings (periodlength INT, periodformat TEXT, startdate DATETIME)")
 	if err != nil {
 		log.Println("error preparing create settings tale statement")
 		log.Printf("%s", err)

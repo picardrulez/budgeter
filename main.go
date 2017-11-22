@@ -13,7 +13,7 @@ import (
 var VERSION = "v0.5.5"
 var LOGFILE string = "/var/log/budget"
 var DEFAULTAUTH = "c@me0c@nd1"
-var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password"}}
+var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password", "/settings|Settings"}}
 var lcarssettings = lcars.Settings{Title: "Budgeter", TopColor: "dodger-blue-alt", BottomColor: "hopbush", MenuColor: "tan", Menu: true}
 
 //create cookie generator
@@ -48,6 +48,8 @@ func main() {
 	router.HandleFunc("/addtotemplate", addtotemplateHandler).Methods("POST")
 	router.HandleFunc("/viewBudget", viewBudgetHandler)
 	router.HandleFunc("/editBudget", editBudgetHandler)
+	router.HandleFunc("/settings", settingsHandler)
+	router.HandleFunc("/updatesettings", updatesettingsHandler).Methods("POST")
 	router.HandleFunc("/createUser", createUserHandler)
 	router.HandleFunc("/usercreation", usercreationHandler)
 
