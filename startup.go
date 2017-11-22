@@ -24,6 +24,14 @@ func startup() int {
 	}
 	templateTableCreate.Exec()
 
+	settingsTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS settings (periodlength INT, periodformat STRING, startdate DATETIME, )")
+	if err != nil {
+		log.Println("error preparing create settings tale statement")
+		log.Printf("%s", err)
+		return 1
+	}
+	settingsTableCreate.Exec()
+
 	if userExists("admin") != true {
 		hashedpass := encryptPassword(DEFAULTAUTH)
 		insertUser("admin", hashedpass)
