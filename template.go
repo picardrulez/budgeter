@@ -21,28 +21,28 @@ func viewTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	content := `
 	<h1>Template</h1>
 	<br/>
-	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td></tr>
+	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td><td>          </td></tr>
 	`
 	for _, k := range templateArray {
-		content = content + "<tr><td>" + k.Name + "</td><td>" + strconv.Itoa(k.Amount) + "</td><td>" + strconv.Itoa(k.Date) + "</td><td>" + k.Website + "</td><td>" + k.Username + "</td><td>" + k.Password + "</td></tr>"
+		content = content + "<tr><td>" + k.Name + "</td><td>" + strconv.Itoa(k.Amount) + "</td><td>" + strconv.Itoa(k.Date) + "</td><td>" + k.Website + "</td><td>" + k.Username + "</td><td>" + k.Password + "</td><td></td></tr>"
 	}
-	content = content + "</table>"
 	content = content + `
 	<form method="post" action="/addtotemplate">
-		<label for="name">Name</label>
-		<input type="text" size="15" id="name" name="name"
+		<tr><td><label for="name">Name</label>
+		<input type="text" size="15" id="name" name="name"</td><td>
 		<label for="amount">Amount</label>
-		<input type="text" size="5" id="amount" name="amount">
+		<input type="text" size="5" id="amount" name="amount"></td><td>
 		<label for="date">Date</label>
-		<input type="text" size="5" id="date" name="date">
+		<input type="text" size="5" id="date" name="date"></td><td>
 		<label for="website">Website</label>
-		<input type="text" size="20" id="website" name="website">
+		<input type="text" size="20" id="website" name="website"></td><td>
 		<label for="username">Username</label>
-		<input type="text" size="20" id="username" name="username">
+		<input type="text" size="20" id="username" name="username"></td><td>
 		<label for="password">Password</label>
-		<input type="text" size="20" id="password" name="password">
-		<button type="submit">Add</button>
+		<input type="text" size="20" id="password" name="password"></td><td>
+		<button type="submit">Add</button></td></tr>
 	</form>
+	</table>
 	`
 	t, createPage := lcars.MakePage(content, mymenu, lcarssettings)
 	t.Execute(w, createPage)

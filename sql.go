@@ -313,6 +313,186 @@ func deleteTemplate(name string) int {
 	return 0
 }
 
+func getAmountValue(id string) (int, bool) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for select")
+		log.Printf("%s", err)
+		db.Close()
+		return 0, true
+	}
+
+	stmt, err := db.Prepare("SELECT amount FROM template where name = ?")
+	if err != nil {
+		log.Println("error preparing select statement")
+		log.Printf("%s", err)
+		db.Close()
+		return 0, true
+	}
+
+	defer stmt.Close()
+	var returnvalue int
+	err = stmt.QueryRow(id).Scan(&returnvalue)
+	if err != nil {
+		log.Println("error scanning row")
+		log.Printf("%s", err)
+		db.Close()
+		return 0, true
+	}
+	db.Close()
+	return returnvalue, false
+}
+
+func getDateValue(id string) (int, bool) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for select")
+		log.Printf("%s", err)
+		db.Close()
+		return 0, true
+	}
+
+	stmt, err := db.Prepare("SELECT date FROM template where name = ?")
+	if err != nil {
+		log.Println("error preparing select statement")
+		log.Printf("%s", err)
+		db.Close()
+		return 0, true
+	}
+
+	defer stmt.Close()
+	var returnvalue int
+	err = stmt.QueryRow(id).Scan(&returnvalue)
+	if err != nil {
+		log.Println("error scanning row")
+		log.Printf("%s", err)
+		db.Close()
+		return 0, true
+	}
+	db.Close()
+	return returnvalue, false
+}
+
+func getWebsiteValue(id string) (string, bool) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for select")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	stmt, err := db.Prepare("SELECT website FROM template where name = ?")
+	if err != nil {
+		log.Println("error preparing select statement")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	defer stmt.Close()
+	var returnvalue string
+	err = stmt.QueryRow(id).Scan(&returnvalue)
+	if err != nil {
+		log.Println("error scanning row")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+	db.Close()
+	return returnvalue, false
+}
+
+func getUsernameValue(id string) (string, bool) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for select")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	stmt, err := db.Prepare("SELECT username FROM template where name = ?")
+	if err != nil {
+		log.Println("error preparint select statement")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	defer stmt.Close()
+	var returnvalue string
+	err = stmt.QueryRow(id).Scan(&returnvalue)
+	if err != nil {
+		log.Println("error scanning row")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+	db.Close()
+	return returnvalue, false
+}
+
+func getPasswordValue(id string) (string, bool) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for select")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	stmt, err := db.Prepare("SELECT password FROM template where name = ?")
+	if err != nil {
+		log.Println("erorr preparing select statement")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	defer stmt.Close()
+	var returnvalue string
+	err = stmt.QueryRow(id).Scan(&returnvalue)
+	if err != nil {
+		log.Println("error scanning row")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+	db.Close()
+	return returnvalue, false
+}
+
+func getValue(id string, item string, table string) (string, bool) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for select")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	stmt, err := db.Prepare("SELECT ? from ? where name = ?")
+	if err != nil {
+		log.Println("error preparing select statement")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+
+	defer stmt.Close()
+	var returnvalue string
+	err = stmt.QueryRow(item, table, id).Scan(&returnvalue)
+	if err != nil {
+		log.Println("error scanning row")
+		log.Printf("%s", err)
+		db.Close()
+		return "", true
+	}
+	db.Close()
+	return returnvalue, false
+}
+
 func rowCounter(rows *sql.Rows) (count int) {
 	for rows.Next() {
 		_ = rows.Scan(&count)
