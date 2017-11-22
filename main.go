@@ -10,7 +10,7 @@ import (
 	"sort"
 )
 
-var VERSION = "v0.5.0"
+var VERSION = "v0.5.5"
 var LOGFILE string = "/var/log/budget"
 var DEFAULTAUTH = "c@me0c@nd1"
 var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password"}}
@@ -43,7 +43,8 @@ func main() {
 	router.HandleFunc("/main", mainHandler)
 	router.HandleFunc("/viewTemplate", viewTemplateHandler)
 	router.HandleFunc("/editTemplate", editTemplateHandler)
-	//	router.HandleFunc("/edittemplateprocessor", edittemplateprocessor).Methods("POST")
+	router.HandleFunc("/edittemplateprocessor", edittemplateprocessor).Methods("POST")
+	router.HandleFunc("/deletetemplateprocessor", deletetemplateprocessor).Methods("POST")
 	router.HandleFunc("/addtotemplate", addtotemplateHandler).Methods("POST")
 	router.HandleFunc("/viewBudget", viewBudgetHandler)
 	router.HandleFunc("/editBudget", editBudgetHandler)

@@ -26,12 +26,12 @@ func viewTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	content = content + "</table>"
 	content = content + `
 	<form method="post" action="/addtotemplate">
-		<labelfor="name">Name</label>
-		<input type="text" id="name" name="name"
+		<label for="name">Name</label>
+		<input type="text" size="15" id="name" name="name"
 		<label for="amount">Amount</label>
-		<input type="text" id="amount" name="amount">
+		<input type="text" size="5" id="amount" name="amount">
 		<label for="date">Date</label>
-		<input type="text" id="date" name="date">
+		<input type="text" size="5" id="date" name="date">
 		<button type="submit">Add</button>
 	</form>
 	`
@@ -64,11 +64,15 @@ func editTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	`
 	for _, k := range templateArray {
 		content = content + "</tr><td>" + k.Name + `</td><td>
-	<FORM METHOD="post" action="/edittemplateprocessor"
+	<FORM METHOD="post" action="/edittemplateprocessor">
 	<input type="hidden" name="name" value="` + k.Name + `">
 		<input type="text" size="5" id="amount" name="amount" value="` + strconv.Itoa(k.Amount) + `"></td><td>
 		<input type="text" size="5" id="date" name="date" value="` + strconv.Itoa(k.Date) + `"></td><td>
 		<button type="submit">Submit</button>
+		</form></td><td>
+		<FORM METHOD="post" action="/deletetemplateprocessor">
+		<input type="hidden" name="name" value="` + k.Name + `">
+		<button type="submit">Delete</button>
 		</form></td></tr>
 		`
 	}
@@ -79,12 +83,32 @@ func editTemplateHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, createPage)
 }
 
-//func edittemplateprocessor (w http.ResponseWriter, r *http.Request) {
-//	userName := getUserName(r)
-//	name := r.FormValue("name")
-//	amount, _ := strconv.Atoi(r.FormValue("amount"))
-//	date, _ := strconv.Atoi(r.FormValue("date"))
-//	if userName != "' {
-//		res := add
-//	}'"
-//}
+func edittemplateprocessor(w http.ResponseWriter, r *http.Request) {
+	userName := getUserName(r)
+	name := r.FormValue("name")
+	amount, _ := strconv.Atoi(r.FormValue("amount"))
+	date, _ := strconv.Atoi(r.FormValue("date"))
+	if userName != "" {
+		res := updateTemplate(name, amount, date)
+		if res != 0 {
+			io.WriteString(w, "an error occured updating item "+name)
+		}
+		http.Redirect(w, r, "/editTemplate", 302)
+	} else {
+		http.Redirect(w, r, "/", 302)
+	}
+}
+
+func deletetemplateprocessor(w http.ResponseWriter, r *http.Request) {
+	userName := getUserName(r)
+	name := r.FormValue("name")
+	if userName != "" {
+		res := deleteTemplate(name)
+		if res != 0 {
+			io.WriteString(w, "an error occured deleting item "+name)
+		}
+		http.Redirect(w, r, "/editTemplate", 302)
+	} else {
+		http.Redirect(w, r, "/", 302)
+	}
+}

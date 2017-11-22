@@ -251,6 +251,65 @@ func addToTemplate(name string, amount int, date int) int {
 	return 0
 }
 
+func updateTemplate(name string, amount int, date int) int {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for insert")
+		log.Printf("%s", err)
+		db.Close()
+		return 1
+	}
+	stmt, err := db.Prepare("update template set amount=?, date=? where name=?")
+	if err != nil {
+		log.Println("error preparing")
+		log.Printf("%s", err)
+		db.Close()
+		return 2
+	}
+
+	res, err := stmt.Exec(amount, date, name)
+	if err != nil {
+		log.Println("error updating")
+		log.Printf("%s", err)
+		db.Close()
+		return 3
+	}
+
+	affect, _ := res.RowsAffected()
+	log.Println(strconv.FormatInt(affect, 10) + " rows affected")
+	db.Close()
+	return 0
+}
+func deleteTemplate(name string) int {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for removal")
+		log.Printf("%s", err)
+		db.Close()
+		return 1
+	}
+	stmt, err := db.Prepare("delete from template where name=?")
+	if err != nil {
+		log.Println("error preparing delete statement")
+		log.Printf("%s", err)
+		db.Close()
+		return 2
+	}
+
+	res, err := stmt.Exec(name)
+	if err != nil {
+		log.Println("error executing delete statement")
+		log.Printf("%s", err)
+		db.Close()
+		return 3
+	}
+
+	affect, _ := res.RowsAffected()
+	log.Println(strconv.FormatInt(affect, 10) + " rows affected")
+	db.Close()
+	return 0
+}
+
 func rowCounter(rows *sql.Rows) (count int) {
 	for rows.Next() {
 		_ = rows.Scan(&count)
