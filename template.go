@@ -56,11 +56,35 @@ func addtotemplateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func editTemplateHandler(w http.ResponseWriter, r *http.Request) {
+	templateArray := templateList()
 	content := `
 	<h1>Edit Template</h1>
 	<br/>
-	<form method="post" action="/"
+	<table><tr><td>Name</td><td>Amount</td><td>Date<td></tr>
+	`
+	for _, k := range templateArray {
+		content = content + "</tr><td>" + k.Name + `</td><td>
+	<FORM METHOD="post" action="/edittemplateprocessor"
+	<input type="hidden" name="name" value="` + k.Name + `">
+		<input type="text" size="5" id="amount" name="amount" value="` + strconv.Itoa(k.Amount) + `"></td><td>
+		<input type="text" size="5" id="date" name="date" value="` + strconv.Itoa(k.Date) + `"></td><td>
+		<button type="submit">Submit</button>
+		</form></td></tr>
+		`
+	}
+	content = content + `
+	</table>
 	`
 	t, createPage := lcars.MakePage(content, mymenu, lcarssettings)
 	t.Execute(w, createPage)
 }
+
+//func edittemplateprocessor (w http.ResponseWriter, r *http.Request) {
+//	userName := getUserName(r)
+//	name := r.FormValue("name")
+//	amount, _ := strconv.Atoi(r.FormValue("amount"))
+//	date, _ := strconv.Atoi(r.FormValue("date"))
+//	if userName != "' {
+//		res := add
+//	}'"
+//}
