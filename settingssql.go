@@ -15,7 +15,7 @@ func getSettings() (Settings, bool) {
 		log.Printf("%s", err)
 		return settings, true
 	}
-	stmt, err := db.Prepare("SELECT periodlength, periodformat, startdate FROM settings")
+	stmt, err := db.Prepare("SELECT * FROM settings")
 	if err != nil {
 		log.Println("error preparing select settings")
 		log.Printf("%s", err)
@@ -27,15 +27,16 @@ func getSettings() (Settings, bool) {
 	var periodformat string
 	var startdate string
 
-	defer stmt.Close()
 	err = stmt.QueryRow().Scan(&periodlength, &periodformat, &startdate)
 	if err != nil {
 		log.Println("error scanning row for settings")
 		log.Printf("%s", err)
 		db.Close()
+		defer stmt.Close()
 		return settings, true
 	}
 	db.Close()
+	defer stmt.Close()
 	settings = Settings{PeriodLength: periodlength, PeriodFormat: periodformat, StartDate: startdate}
 	return settings, false
 }

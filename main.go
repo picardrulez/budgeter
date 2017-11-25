@@ -15,6 +15,9 @@ var LOGFILE string = "/var/log/budget"
 var DEFAULTAUTH = "c@me0c@nd1"
 var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password", "/settings|Settings"}}
 var lcarssettings = lcars.Settings{Title: "Budgeter", TopColor: "dodger-blue-alt", BottomColor: "hopbush", MenuColor: "tan", Menu: true}
+var PERIODLENGTH = 14
+var PERIODFORMAT = "Days"
+var STARTDATE = []int{11, 17, 2017}
 
 //create cookie generator
 var cookieHandler = securecookie.New(

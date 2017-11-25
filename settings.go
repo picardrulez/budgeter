@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/picardrulez/lcars"
-	"io"
 	"net/http"
 	"strconv"
 )
@@ -14,15 +13,14 @@ type Settings struct {
 }
 
 func settingsHandler(w http.ResponseWriter, r *http.Request) {
-	settings, _ := getSettings()
 	content := `
 	<h1>Settings</h1>
 	<br/>
-	<table<tr><td>Period Length</td><td>Period FOrmat</td><td>Start Date</td><td></td></tr>
+	<table<tr><td>Period Length</td><td>Period Format</td><td>Start Date</td><td></td></tr>
 	<form method="post" action="/updatesettings">
-	<tr><td><input type="text" size="5" id="periodlength" name="periodlength" value="` + strconv.Itoa(settings.PeriodLength) + `"></td><td>
-	<input type="text" size="5" id="periodformat" name="periodformat" value="` + settings.PeriodFormat + `"></td><td>
-	<input type="text" size="5" id="startdate" name="startdate" value="` + settings.StartDate + `"></td><td>
+	<tr><td><input type="text" size="5" id="periodlength" name="periodlength" value="` + strconv.Itoa(PERIODLENGTH) + `"></td><td>
+	<input type="text" size="5" id="periodformat" name="periodformat" value="` + PERIODFORMAT + `"></td><td>
+	<input type="text" size="5" id="startdate" name="startdate" value="` + strconv.Itoa(STARTDATE[0]) + "/" + strconv.Itoa(STARTDATE[1]) + "/" + strconv.Itoa(STARTDATE[2]) + `"></td><td>
 	<button type="submit">Update</button></td></tr>
 	</form>
 	</table>
@@ -37,14 +35,14 @@ func updatesettingsHandler(w http.ResponseWriter, r *http.Request) {
 	periodformat := r.FormValue("periodformat")
 	startdate := r.FormValue("startdate")
 
-	settings := Settings{PeriodLength: periodlength, PeriodFormat: periodformat, StartDate: startdate}
 	if userName != "" {
-		res := updateSettings(settings)
-		if res != 0 {
-			io.WriteString(w, "an error occured updating settings")
-		}
 		http.Redirect(w, r, "/settings", 302)
 	} else {
+		PERIODLENGTH = periodlength
+		PERIODFORMAT = periodformat
+		STARTDATE[0] = startdate[0]
+		STARTDATE[1] = startdate[1]
+		STARTDATE[2] = startdate[2]
 		http.Redirect(w, r, "/", 302)
 	}
 }
