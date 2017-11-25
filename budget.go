@@ -7,30 +7,26 @@ import (
 )
 
 func viewBudgetHandler(w http.ResponseWriter, r *http.Request) {
+	thisItem := getTemplateItem("Netflix")
 	content := `
 	<h1>Budget</h1>
 	<br/>
 	<br/>
 	budget stuff goes here
 	`
-	amount, _ := getAmountValue("Netflix")
-	date, _ := getDateValue("Netflix")
-	website, _ := getWebsiteValue("Netflix")
-	username, _ := getUsernameValue("Netflix")
-	password, _ := getPasswordValue("Netflix")
 	content = content + `
 	<br/>
-	|NETFLIX|
+	` + thisItem.Name + `
 	<br/>
-	Amount: ` + strconv.Itoa(amount) + `
+	Amount: ` + strconv.Itoa(thisItem.Amount) + `
 	<br/>
-	Date:  ` + strconv.Itoa(date) + `
+	Date:  ` + strconv.Itoa(thisItem.Date) + `
 	<br/>
-	Website: ` + website + `
+	Website: ` + thisItem.Website + `
 	<br/>
-	Username: ` + username + `
+	Username: ` + thisItem.Username + `
 	<br/>
-	Password: ` + password + `
+	Password: ` + thisItem.Password + `
 	<br/>
 	`
 
@@ -47,4 +43,8 @@ func editBudgetHandler(w http.ResponseWriter, r *http.Request) {
 	`
 	t, createPage := lcars.MakePage(content, mymenu, lcarssettings)
 	t.Execute(w, createPage)
+}
+
+func isPayDay(int) bool {
+	return true
 }

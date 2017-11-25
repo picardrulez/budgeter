@@ -23,8 +23,12 @@ func getSettings() (Settings, bool) {
 		return settings, true
 	}
 
+	var periodlength int
+	var periodformat string
+	var startdate string
+
 	defer stmt.Close()
-	err = stmt.QueryRow().Scan(&settings.PeriodLength, &settings.PeriodFormat, &settings.StartDate)
+	err = stmt.QueryRow().Scan(&periodlength, &periodformat, &startdate)
 	if err != nil {
 		log.Println("error scanning row for settings")
 		log.Printf("%s", err)
@@ -32,6 +36,7 @@ func getSettings() (Settings, bool) {
 		return settings, true
 	}
 	db.Close()
+	settings = Settings{PeriodLength: periodlength, PeriodFormat: periodformat, StartDate: startdate}
 	return settings, false
 }
 
