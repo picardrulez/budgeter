@@ -24,6 +24,14 @@ func startup() int {
 	}
 	templateTableCreate.Exec()
 
+	budgetTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS budget (name TEXT, ispaid BOOL default 0)")
+	if err != nil {
+		log.Println("error preparing create budget table statement")
+		log.Printf("%s", err)
+		return 1
+	}
+	budgetTableCreate.Exec()
+
 	settingsTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS settings (periodlength INT, periodformat TEXT, startdate TEXT)")
 	if err != nil {
 		log.Println("error preparing create settings tale statement")

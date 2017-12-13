@@ -24,7 +24,7 @@ func settingsHandler(w http.ResponseWriter, r *http.Request) {
 	<form method="post" action="/updatesettings">
 	<tr><td><input type="text" size="5" id="periodlength" name="periodlength" value="` + strconv.Itoa(settings.PeriodLength) + `"></td><td>
 	<input type="text" size="5" id="periodformat" name="periodformat" value="` + settings.PeriodFormat + `"></td><td>
-	<input type="text" size="5" id="startdate" name="startdate" value="` + settings.StartDate + `"></td><td>
+	<input type="date" size="5" id="startdate" name="startdate" value="` + settings.StartDate + `"></td><td>
 	<button type="submit">Update</button></td></tr>
 	</form>
 	</table>

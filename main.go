@@ -13,7 +13,7 @@ import (
 var VERSION = "v0.5.5"
 var LOGFILE string = "/var/log/budget"
 var DEFAULTAUTH = "c@me0c@nd1"
-var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password", "/settings|Settings"}}
+var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password", "/settings|Settings", "/dropTables|Drop Tables"}}
 var lcarssettings = lcars.Settings{Title: "Budgeter", TopColor: "dodger-blue-alt", BottomColor: "hopbush", MenuColor: "tan", Menu: true}
 var PERIODLENGTH = 14
 var PERIODFORMAT = "Days"
@@ -55,6 +55,8 @@ func main() {
 	router.HandleFunc("/updatesettings", updatesettingsHandler).Methods("POST")
 	router.HandleFunc("/createUser", createUserHandler)
 	router.HandleFunc("/usercreation", usercreationHandler)
+	router.HandleFunc("/dropTables", dropTablesHandler)
+	router.HandleFunc("/dropTablesprocessor", dropTablesProcessor).Methods("POST")
 
 	http.Handle("/", router)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
