@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -58,4 +59,99 @@ func getBudgetList() ([]string, int) {
 	rows.Close()
 	db.Close()
 	return budgetList, 0
+}
+
+func getCurrentBudget() ([]string, int) {
+	var budgetList []string
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db")
+		log.Printf("%s", err)
+		db.Close()
+		return budgetList, 1
+	}
+
+	rows, err := db.Query("SELECT name, ispaid FROM budget")
+	if err != nil {
+		log.Println("error querying db")
+		log.Printf("%s", err)
+		db.Close()
+		return budgetList, 2
+	}
+
+	var name string
+	var ispaid string
+
+	for rows.Next() {
+		err = rows.Scan(&name, &ispaid)
+		if err != nil {
+			log.Println("error scannign rows")
+			log.Printf("%s", err)
+			rows.Close()
+			db.Close()
+			return budgetList, 3
+		}
+		budgetList = append(budgetList, name+":"+ispaid)
+	}
+	rows.Close()
+	db.Close()
+	return budgetList, 0
+}
+
+func removePaidItems() int {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for insert")
+		log.Printf("%s", err)
+		db.Close()
+		return 1
+	}
+	stmt, err := db.Prepare("delete from budget where ispaid='true'")
+	if err != nil {
+		log.Println("error preparing delete statement")
+		log.Printf("%s", err)
+		db.Close()
+		return 2
+	}
+
+	res, err := stmt.Exec()
+	if err != nil {
+		log.Println("error executing delete statement")
+		log.Printf("%s", err)
+		db.Close()
+		return 3
+	}
+
+	affect, _ := res.RowsAffected()
+	log.Println(strconv.FormatInt(affect, 10) + " rows deleted from budget")
+	db.Close()
+	return 0
+}
+
+func budgetInsert(newBudget []string) int {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db for insert")
+		log.Printf("%s", err)
+		db.Close()
+		return 1
+	}
+	for _, k := range newBudget {
+		stmt, err := db.Prepare("INSERT INTO budget(name, ispaid) values(?,?)")
+		if err != nil {
+			log.Println("error preparing insert statement")
+			log.Printf("%s", err)
+			db.Close()
+			return 2
+		}
+		_, err = stmt.Exec(k, "false")
+		if err != nil {
+			log.Println("error executing insert statement")
+			log.Printf("%s", err)
+			db.Close()
+			return 3
+		}
+	}
+	db.Close()
+	return 0
 }

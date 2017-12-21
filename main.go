@@ -4,13 +4,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 	"github.com/picardrulez/lcars"
+	"github.com/robfig/cron"
 	"log"
 	"net/http"
 	"os"
 	"sort"
 )
 
-var VERSION = "v0.5.5"
+var VERSION = "v0.6.0"
 var LOGFILE string = "/var/log/budget"
 var DEFAULTAUTH = "c@me0c@nd1"
 var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password", "/settings|Settings", "/dropTables|Drop Tables"}}
@@ -41,6 +42,9 @@ func main() {
 	log.SetOutput(f)
 	log.Println("-----------------------------------")
 	startup()
+	c := cron.New()
+	c.AddFunc("0 0 1 * * *", budgetCheck)
+	c.Start()
 	router.HandleFunc("/", rootHandler)
 	router.HandleFunc("/login", loginHandler)
 	router.HandleFunc("/main", mainHandler)
@@ -56,7 +60,7 @@ func main() {
 	router.HandleFunc("/createUser", createUserHandler)
 	router.HandleFunc("/usercreation", usercreationHandler)
 	router.HandleFunc("/dropTables", dropTablesHandler)
-	router.HandleFunc("/dropTablesprocessor", dropTablesProcessor).Methods("POST")
+	router.HandleFunc("/dropTablesProcessor", dropTablesProcessor).Methods("POST")
 
 	http.Handle("/", router)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))

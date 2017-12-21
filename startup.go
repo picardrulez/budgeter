@@ -32,7 +32,7 @@ func startup() int {
 	}
 	budgetTableCreate.Exec()
 
-	settingsTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS settings (periodlength INT, periodformat TEXT, startdate TEXT)")
+	settingsTableCreate, err := database.Prepare("CREATE TABLE IF NOT EXISTS settings (periodlength INT, periodformat TEXT, startdate TEXT, currentpayday TEXT)")
 	if err != nil {
 		log.Println("error preparing create settings tale statement")
 		log.Printf("%s", err)
@@ -48,7 +48,7 @@ func startup() int {
 	}
 	settingscount := rowCounter(settingsrows)
 	if settingscount < 1 {
-		settingsInsert, err := database.Prepare("INSERT INTO settings VALUES(1, 'Days', '01/01/2017')")
+		settingsInsert, err := database.Prepare("INSERT INTO settings VALUES(1, 'Days', '01-01-2017', '01-01-2017')")
 		if err != nil {
 			log.Println("error preparing db insert for settings")
 			log.Printf("%s", err)
@@ -81,4 +81,13 @@ func startup() int {
 		log.Println(k)
 	}
 	return 0
+}
+
+func budgetCheck() {
+	if isOutOfPayPeriod() {
+		createreturn := createNewPayPeriod()
+		if createreturn > 0 {
+			log.Println("error creating new pay period")
+		}
+	}
 }

@@ -26,8 +26,9 @@ func getSettings() (Settings, bool) {
 	var periodlength int
 	var periodformat string
 	var startdate string
+	var currentpayday string
 
-	err = stmt.QueryRow().Scan(&periodlength, &periodformat, &startdate)
+	err = stmt.QueryRow().Scan(&periodlength, &periodformat, &startdate, &currentpayday)
 	if err != nil {
 		log.Println("error scanning row for settings")
 		log.Printf("%s", err)
@@ -37,7 +38,7 @@ func getSettings() (Settings, bool) {
 	}
 	db.Close()
 	defer stmt.Close()
-	settings = Settings{PeriodLength: periodlength, PeriodFormat: periodformat, StartDate: startdate}
+	settings = Settings{PeriodLength: periodlength, PeriodFormat: periodformat, StartDate: startdate, CurrentPayDay: currentpayday}
 	return settings, false
 }
 
@@ -49,7 +50,7 @@ func updateSettings(settings Settings) int {
 		db.Close()
 		return 1
 	}
-	stmt, err := db.Prepare("update settings set periodlength = ?, periodformat = ?, startdate = ?")
+	stmt, err := db.Prepare("update settings set periodlength = ?, periodformat = ?, startdate = ?, currentpayday = ?")
 	if err != nil {
 		log.Println("error preparing ")
 		log.Printf("%s", err)
@@ -57,7 +58,7 @@ func updateSettings(settings Settings) int {
 		return 2
 	}
 
-	res, err := stmt.Exec(settings.PeriodLength, settings.PeriodFormat, settings.StartDate)
+	res, err := stmt.Exec(settings.PeriodLength, settings.PeriodFormat, settings.StartDate, settings.CurrentPayDay)
 	if err != nil {
 		log.Println("error updating")
 		log.Printf("%s", err)

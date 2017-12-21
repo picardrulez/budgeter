@@ -10,9 +10,10 @@ import (
 )
 
 type Settings struct {
-	PeriodLength int
-	PeriodFormat string
-	StartDate    string
+	PeriodLength  int
+	PeriodFormat  string
+	StartDate     string
+	CurrentPayDay string
 }
 
 func settingsHandler(w http.ResponseWriter, r *http.Request) {
@@ -63,9 +64,10 @@ func updatesettingsHandler(w http.ResponseWriter, r *http.Request) {
 		var periodLength int
 		var periodFormat string
 		var startDate string
+		var currentPayDay string
 
 		for rows.Next() {
-			err = rows.Scan(&periodLength, &periodFormat, &startDate)
+			err = rows.Scan(&periodLength, &periodFormat, &startDate, &currentPayDay)
 			if err != nil {
 				log.Println("error scanning rows")
 				log.Printf("%s", err)

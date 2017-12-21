@@ -10,6 +10,7 @@ import (
 )
 
 func viewBudgetHandler(w http.ResponseWriter, r *http.Request) {
+	budgetCheck()
 	nextPayDay := getNextPayDay()
 	lastpayday := getLastPayDay()
 	budgetList, _ := getBudgetList()
@@ -67,6 +68,35 @@ func isPayDay(datecheck string) bool {
 	return returnbool
 }
 
+func isOutOfPayPeriod() bool {
+	settings, _ := getSettings()
+	nowdate := time.Now()
+	nowdateformatted := nowdate.Format("2006-01-02")
+	nowArray := strings.Split(nowdateformatted, "-")
+	nowYear, _ := strconv.Atoi(nowArray[0])
+	nowMonthInt, _ := strconv.Atoi(nowArray[1])
+	nowMonth := time.Month(nowMonthInt)
+	nowDay, _ := strconv.Atoi(nowArray[2])
+	nowcheck := time.Date(nowYear, nowMonth, nowDay, 0, 0, 0, 0, time.UTC)
+
+	currentPayDay := settings.CurrentPayDay
+	cpdArray := strings.Split(currentPayDay, "-")
+	cpdYear, _ := strconv.Atoi(cpdArray[0])
+	cpdMonthInt, _ := strconv.Atoi(cpdArray[1])
+	cpdMonth := time.Month(cpdMonthInt)
+	cpdDay, _ := strconv.Atoi(cpdArray[2])
+	cpdcheck := time.Date(cpdYear, cpdMonth, cpdDay, 0, 0, 0, 0, time.UTC)
+
+	diff := cpdcheck.Sub(nowcheck)
+	days := diff.Hours() / 24
+
+	if days > 13 {
+		return true
+	} else {
+		return false
+	}
+}
+
 func getLastPayDay() string {
 	nowdate := time.Now()
 	hazpayday := false
@@ -94,4 +124,19 @@ func getNextPayDay() string {
 	nextdate := lastDate.AddDate(0, 0, 14)
 	nextFormatted := nextdate.Format("2006-01-02")
 	return nextFormatted
+}
+
+func createNewPayPeriod() int {
+	newBudget, _ := getBudgetList()
+	removeItemsReturn := removePaidItems()
+	if removeItemsReturn > 0 {
+		log.Println("error removing paid items from budget")
+		return 1
+	}
+	insertReturn := budgetInsert(newBudget)
+	if insertReturn > 0 {
+		log.Println("error inserting new budget")
+		return 2
+	}
+	return 0
 }
