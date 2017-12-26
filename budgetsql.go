@@ -19,7 +19,8 @@ func getTemplateItem(name string) TemplateItem {
 }
 
 func getBudgetList() ([]string, int) {
-	lastPayDate := getLastPayDay()
+	settings, _ := getSettings()
+	lastPayDate := getLastPayDay(settings)
 	nextPayDate := getNextPayDay()
 	lastArray := strings.Split(lastPayDate, "-")
 	nextArray := strings.Split(nextPayDate, "-")
@@ -154,4 +155,21 @@ func budgetInsert(newBudget []string) int {
 	}
 	db.Close()
 	return 0
+}
+
+func isBudgetEmpty() bool {
+	//database, _ := sql.Open("sqlite3", "./budget.db")
+	//budgetrows, err := database.Query("SELECT * from template")
+	//if err != nil {
+	//	log.Println("error running select against budget")
+	//	log.Printf("%s", err)
+	//	return false
+	//}
+	//budgetcount := rowCounter(budgetrows)
+	budgetcount := newRowCounter("budget")
+	if budgetcount > 0 {
+		return false
+	} else {
+		return true
+	}
 }

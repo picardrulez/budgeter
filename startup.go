@@ -48,7 +48,7 @@ func startup() int {
 	}
 	settingscount := rowCounter(settingsrows)
 	if settingscount < 1 {
-		settingsInsert, err := database.Prepare("INSERT INTO settings VALUES(1, 'Days', '01-01-2017', '01-01-2017')")
+		settingsInsert, err := database.Prepare("INSERT INTO settings VALUES(14, 'Days', '06-12-2017', '06-12-2017')")
 		if err != nil {
 			log.Println("error preparing db insert for settings")
 			log.Printf("%s", err)
@@ -84,7 +84,9 @@ func startup() int {
 }
 
 func budgetCheck() {
-	if isOutOfPayPeriod() {
+	log.Println("in budgetCheck")
+	if isOutOfPayPeriod() || isBudgetEmpty() {
+		log.Println("starting if isOutOFPayPeriod")
 		createreturn := createNewPayPeriod()
 		if createreturn > 0 {
 			log.Println("error creating new pay period")

@@ -497,5 +497,26 @@ func rowCounter(rows *sql.Rows) (count int) {
 	for rows.Next() {
 		_ = rows.Scan(&count)
 	}
+	countstring := strconv.Itoa(count)
+	log.Println("string count is " + countstring)
+	return count
+}
+
+func newRowCounter(table string) (count int) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	if err != nil {
+		log.Println("error opening db")
+		log.Printf("%s", err)
+		db.Close()
+		return 1
+	}
+
+	rows, err := db.Query("SELECT COUNT(*) as count FROM " + table)
+	for rows.Next() {
+		err := rows.Scan(&count)
+		if err != nil {
+			log.Println("error scanning rows")
+		}
+	}
 	return count
 }

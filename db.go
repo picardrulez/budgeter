@@ -31,6 +31,7 @@ func dropTablesProcessor(w http.ResponseWriter, r *http.Request) {
 			log.Print(err)
 		}
 		database.Close()
+		http.Redirect(w, r, "/dropTables", 302)
 	} else {
 		http.Redirect(w, r, "/", 302)
 	}

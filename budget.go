@@ -10,22 +10,26 @@ import (
 )
 
 func viewBudgetHandler(w http.ResponseWriter, r *http.Request) {
+	settings, _ := getSettings()
 	budgetCheck()
 	nextPayDay := getNextPayDay()
-	lastpayday := getLastPayDay()
-	budgetList, _ := getBudgetList()
+	lastpayday := getLastPayDay(settings)
+	budgetList, _ := getCurrentBudget()
 	amountTotal := 0
 	content := `
 	<h1>Budget</h1>
 	<br/>
 	Pay Period:  ` + lastpayday + ` - ` + nextPayDay + `
 	<br/>
-	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td></tr>
+	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td><td>Paid</td></tr>
 	`
 	for _, k := range budgetList {
-		currentItem := getTemplateItem(k)
+		itemArray := strings.Split(k, ":")
+		itemName := itemArray[0]
+		itemPaid := itemArray[1]
+		currentItem := getTemplateItem(itemName)
 		amountTotal = amountTotal + currentItem.Amount
-		content = content + "<tr><td>" + currentItem.Name + "</td><td>" + strconv.Itoa(currentItem.Amount) + "</td><td>" + strconv.Itoa(currentItem.Date) + "</td><td>" + currentItem.Website + "</td><td>" + currentItem.Username + "</td><td>" + currentItem.Password + "</td></tr>"
+		content = content + "<tr><td>" + currentItem.Name + "</td><td>" + strconv.Itoa(currentItem.Amount) + "</td><td>" + strconv.Itoa(currentItem.Date) + "</td><td>" + currentItem.Website + "</td><td>" + currentItem.Username + "</td><td>" + currentItem.Password + "</td><td>" + itemPaid + "</td></tr>"
 	}
 	content = content + "<tr><td>TOTAL:</td><td>" + strconv.Itoa(amountTotal) + "</td><td></td><td></td><td></td><td></td></tr>"
 	content = content + "</table>"
@@ -45,8 +49,7 @@ func editBudgetHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, createPage)
 }
 
-func isPayDay(datecheck string) bool {
-	settings, _ := getSettings()
+func isPayDay(datecheck string, settings Settings) bool {
 	payday := settings.StartDate
 	length := settings.PeriodLength
 	dateArray := strings.Split(payday, "-")
@@ -97,13 +100,13 @@ func isOutOfPayPeriod() bool {
 	}
 }
 
-func getLastPayDay() string {
+func getLastPayDay(settings Settings) string {
 	nowdate := time.Now()
 	hazpayday := false
 	var lastpayday string
 	for hazpayday == false {
 		nowdateformated := nowdate.Format("2006-01-02")
-		paydaycheck := isPayDay(nowdateformated)
+		paydaycheck := isPayDay(nowdateformated, settings)
 		if paydaycheck {
 			lastpayday = nowdateformated
 			hazpayday = true
@@ -115,7 +118,8 @@ func getLastPayDay() string {
 }
 
 func getNextPayDay() string {
-	lastPayDay := getLastPayDay()
+	settings, _ := getSettings()
+	lastPayDay := getLastPayDay(settings)
 	lastDate, err := time.Parse("2006-01-02", lastPayDay)
 	if err != nil {
 		log.Println(err)

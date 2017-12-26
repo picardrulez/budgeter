@@ -43,6 +43,10 @@ func getSettings() (Settings, bool) {
 }
 
 func updateSettings(settings Settings) int {
+	log.Println("updating currentpayday")
+	settings.CurrentPayDay = getLastPayDay(settings)
+	log.Println("CurrentPayDay is " + settings.CurrentPayDay)
+	log.Println("opening budget.db")
 	db, err := sql.Open("sqlite3", "./budget.db")
 	if err != nil {
 		log.Println("error opening db for insert")
@@ -50,6 +54,7 @@ func updateSettings(settings Settings) int {
 		db.Close()
 		return 1
 	}
+	log.Println("preparing statement")
 	stmt, err := db.Prepare("update settings set periodlength = ?, periodformat = ?, startdate = ?, currentpayday = ?")
 	if err != nil {
 		log.Println("error preparing ")
@@ -58,6 +63,7 @@ func updateSettings(settings Settings) int {
 		return 2
 	}
 
+	log.Println("executing statement")
 	res, err := stmt.Exec(settings.PeriodLength, settings.PeriodFormat, settings.StartDate, settings.CurrentPayDay)
 	if err != nil {
 		log.Println("error updating")
