@@ -84,7 +84,6 @@ func startup() int {
 }
 
 func budgetCheck() {
-	log.Println("in budgetCheck")
 	if isOutOfPayPeriod() || isBudgetEmpty() {
 		log.Println("starting if isOutOFPayPeriod")
 		createreturn := createNewPayPeriod()

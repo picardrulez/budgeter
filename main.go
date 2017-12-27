@@ -11,7 +11,7 @@ import (
 	"sort"
 )
 
-var VERSION = "v0.6.0"
+var VERSION = "v0.9.2"
 var LOGFILE string = "/var/log/budget"
 var DEFAULTAUTH = "c@me0c@nd1"
 var mymenu = lcars.Menu{Items: []string{"/viewTemplate|View Template", "/editTemplate|Edit Template", "/viewBudget|View Budget", "/editBudget|Edit Budget", "/createUser|Create User", "/changePassword|Change Password", "/settings|Settings", "/dropTables|Drop Tables"}}
@@ -55,6 +55,7 @@ func main() {
 	router.HandleFunc("/addtotemplate", addtotemplateHandler).Methods("POST")
 	router.HandleFunc("/viewBudget", viewBudgetHandler)
 	router.HandleFunc("/editBudget", editBudgetHandler)
+	router.HandleFunc("/payItemProcessor", payItemProcessor).Methods("POST")
 	router.HandleFunc("/settings", settingsHandler)
 	router.HandleFunc("/updatesettings", updatesettingsHandler).Methods("POST")
 	router.HandleFunc("/createUser", createUserHandler)

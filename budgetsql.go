@@ -173,3 +173,39 @@ func isBudgetEmpty() bool {
 		return true
 	}
 }
+
+func payItem(item string, pay int) {
+	db, err := sql.Open("sqlite3", "./budget.db")
+	var mybool string
+	if pay == 0 {
+		mybool = "false"
+	} else if pay == 1 {
+		mybool = "true"
+	}
+
+	if err != nil {
+		log.Println("error opening db for pay update")
+		log.Printf("%s", err)
+		db.Close()
+		return
+	}
+	stmt, err := db.Prepare("update budget set ispaid = ? where name = ?")
+	if err != nil {
+		log.Println("error preparing pay update statement")
+		log.Printf("%s", err)
+		db.Close()
+		return
+	}
+	res, err := stmt.Exec(mybool, item)
+	if err != nil {
+		log.Println("error updating paid item")
+		log.Printf("%s", err)
+		db.Close()
+		return
+	}
+	affect, _ := res.RowsAffected()
+	log.Println(strconv.FormatInt(affect, 10) + " rows affected")
+	db.Close()
+	return
+
+}

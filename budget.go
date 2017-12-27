@@ -21,17 +21,23 @@ func viewBudgetHandler(w http.ResponseWriter, r *http.Request) {
 	<br/>
 	Pay Period:  ` + lastpayday + ` - ` + nextPayDay + `
 	<br/>
-	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td><td>Paid</td></tr>
+	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td><td>Paid</td><td></td></tr>
 	`
 	for _, k := range budgetList {
 		itemArray := strings.Split(k, ":")
 		itemName := itemArray[0]
 		itemPaid := itemArray[1]
+		log.Println("itemPaid is " + itemPaid)
 		currentItem := getTemplateItem(itemName)
 		amountTotal = amountTotal + currentItem.Amount
-		content = content + "<tr><td>" + currentItem.Name + "</td><td>" + strconv.Itoa(currentItem.Amount) + "</td><td>" + strconv.Itoa(currentItem.Date) + "</td><td>" + currentItem.Website + "</td><td>" + currentItem.Username + "</td><td>" + currentItem.Password + "</td><td>" + itemPaid + "</td></tr>"
+		content = content + "<tr><td>" + currentItem.Name + "</td><td>" + strconv.Itoa(currentItem.Amount) + "</td><td>" + strconv.Itoa(currentItem.Date) + "</td><td>" + currentItem.Website + "</td><td>" + currentItem.Username + "</td><td>" + currentItem.Password + "</td><td>" + itemPaid + "</td><td><FORM METHOD='post' action='/payItemProcessor'>"
+		if itemPaid == "false" {
+			content = content + "<input type='hidden' name='item' value='" + currentItem.Name + "'><input type='hidden' name='pay' value='1'><button type='submit'>Paid</button></form></td></tr>"
+		} else {
+			content = content + "<input type='hidden' name='item' value='" + currentItem.Name + "'><input type='hidden' name='pay' value='0'><button type='submit'>Unpay</button></form></td></tr>"
+		}
 	}
-	content = content + "<tr><td>TOTAL:</td><td>" + strconv.Itoa(amountTotal) + "</td><td></td><td></td><td></td><td></td></tr>"
+	content = content + "<tr><td>TOTAL:</td><td>" + strconv.Itoa(amountTotal) + "</td><td></td><td></td><td></td><td></td><td></td></tr>"
 	content = content + "</table>"
 
 	t, createPage := lcars.MakePage(content, mymenu, lcarssettings)
@@ -143,4 +149,16 @@ func createNewPayPeriod() int {
 		return 2
 	}
 	return 0
+}
+
+func payItemProcessor(w http.ResponseWriter, r *http.Request) {
+	userName := getUserName(r)
+	item := r.FormValue("item")
+	pay, _ := strconv.Atoi(r.FormValue("pay"))
+	if userName != "" {
+		payItem(item, pay)
+		http.Redirect(w, r, "/viewBudget", 302)
+	} else {
+		http.Redirect(w, r, "/", 302)
+	}
 }
