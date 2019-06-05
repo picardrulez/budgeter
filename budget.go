@@ -21,7 +21,8 @@ func viewBudgetHandler(w http.ResponseWriter, r *http.Request) {
 	<br/>
 	Pay Period:  ` + lastpayday + ` - ` + nextPayDay + `
 	<br/>
-	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td><td>Paid</td><td></td></tr>
+	<FORM METHOD='post' action='/forceBudgetCreation'><button type='submit'>Force Budget Refresh</button></form><br/>
+	<table><tr><td>Name</td><td>Amount</td><td>Date</td><td>Website</td><td>Username</td><td>Password</td><td>Paid</td><td></td><td></td></tr>
 	`
 	for _, k := range budgetList {
 		itemArray := strings.Split(k, ":")
@@ -32,12 +33,19 @@ func viewBudgetHandler(w http.ResponseWriter, r *http.Request) {
 		amountTotal = amountTotal + currentItem.Amount
 		content = content + "<tr><td>" + currentItem.Name + "</td><td>" + strconv.Itoa(currentItem.Amount) + "</td><td>" + strconv.Itoa(currentItem.Date) + "</td><td>" + currentItem.Website + "</td><td>" + currentItem.Username + "</td><td>" + currentItem.Password + "</td><td>" + itemPaid + "</td><td><FORM METHOD='post' action='/payItemProcessor'>"
 		if itemPaid == "false" {
-			content = content + "<input type='hidden' name='item' value='" + currentItem.Name + "'><input type='hidden' name='pay' value='1'><button type='submit'>Paid</button></form></td></tr>"
+			islate := isLate(currentItem.Date)
+			content = content + "<input type='hidden' name='item' value='" + currentItem.Name + "'><input type='hidden' name='pay' value='1'><button type='submit'>Paid</button></form></td><td>"
+			if islate {
+				content = content + "<text='red'>LATE</text></td></tr>"
+			} else {
+				content = content + "</td></tr>"
+			}
+
 		} else {
-			content = content + "<input type='hidden' name='item' value='" + currentItem.Name + "'><input type='hidden' name='pay' value='0'><button type='submit'>Unpay</button></form></td></tr>"
+			content = content + "<input type='hidden' name='item' value='" + currentItem.Name + "'><input type='hidden' name='pay' value='0'><button type='submit'>Unpay</button></form></td><td></td></tr>"
 		}
 	}
-	content = content + "<tr><td>TOTAL:</td><td>" + strconv.Itoa(amountTotal) + "</td><td></td><td></td><td></td><td></td><td></td></tr>"
+	content = content + "<tr><td>TOTAL:</td><td>" + strconv.Itoa(amountTotal) + "</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>"
 	content = content + "</table>"
 
 	t, createPage := lcars.MakePage(content, mymenu, lcarssettings)
@@ -157,6 +165,19 @@ func payItemProcessor(w http.ResponseWriter, r *http.Request) {
 	pay, _ := strconv.Atoi(r.FormValue("pay"))
 	if userName != "" {
 		payItem(item, pay)
+		http.Redirect(w, r, "/viewBudget", 302)
+	} else {
+		http.Redirect(w, r, "/", 302)
+	}
+}
+
+func budgetCreationProcessor(w http.ResponseWriter, r *http.Request) {
+	userName := getUserName(r)
+	if userName != "" {
+		response := createNewPayPeriod()
+		if response > 0 {
+			log.Println("error creating pay period")
+		}
 		http.Redirect(w, r, "/viewBudget", 302)
 	} else {
 		http.Redirect(w, r, "/", 302)

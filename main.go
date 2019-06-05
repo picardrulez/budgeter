@@ -55,6 +55,7 @@ func main() {
 	router.HandleFunc("/addtotemplate", addtotemplateHandler).Methods("POST")
 	router.HandleFunc("/viewBudget", viewBudgetHandler)
 	router.HandleFunc("/editBudget", editBudgetHandler)
+	router.HandleFunc("/forceBudgetCreation", budgetCreationProcessor).Methods("POST")
 	router.HandleFunc("/payItemProcessor", payItemProcessor).Methods("POST")
 	router.HandleFunc("/settings", settingsHandler)
 	router.HandleFunc("/updatesettings", updatesettingsHandler).Methods("POST")

@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func getTemplateItem(name string) TemplateItem {
@@ -19,6 +20,7 @@ func getTemplateItem(name string) TemplateItem {
 }
 
 func getBudgetList() ([]string, int) {
+	log.Println("getting budget list")
 	settings, _ := getSettings()
 	lastPayDate := getLastPayDay(settings)
 	nextPayDate := getNextPayDay()
@@ -36,29 +38,55 @@ func getBudgetList() ([]string, int) {
 		return budgetList, 1
 	}
 
-	rows, err := db.Query("SELECT name FROM template where date >= " + lastPayDay + " AND date < " + nextPayDay)
-	if err != nil {
-		log.Println("error querying db")
-		log.Printf("%s", err)
-		db.Close()
-		return budgetList, 2
-	}
-
-	var name string
-
-	for rows.Next() {
-		err = rows.Scan(&name)
+	if nextPayDay < lastPayDay {
+		rows, err := db.Query("SELECT name from template where date >= " + lastPayDay + " OR date < " + nextPayDay)
 		if err != nil {
-			log.Println("error scanning rows")
+			log.Println("error querying db")
 			log.Printf("%s", err)
-			rows.Close()
 			db.Close()
-			return budgetList, 3
+			return budgetList, 2
 		}
-		budgetList = append(budgetList, name)
+
+		var name string
+
+		for rows.Next() {
+			err = rows.Scan(&name)
+			if err != nil {
+				log.Println("error scannign rows")
+				log.Printf("%s", err)
+				rows.Close()
+				db.Close()
+				return budgetList, 3
+			}
+			budgetList = append(budgetList, name)
+		}
+		rows.Close()
+		db.Close()
+	} else {
+		rows, err := db.Query("SELECT name FROM template where date >= " + lastPayDay + " AND date < " + nextPayDay)
+		if err != nil {
+			log.Println("error querying db")
+			log.Printf("%s", err)
+			db.Close()
+			return budgetList, 2
+		}
+
+		var name string
+
+		for rows.Next() {
+			err = rows.Scan(&name)
+			if err != nil {
+				log.Println("error scannign rows")
+				log.Printf("%s", err)
+				rows.Close()
+				db.Close()
+				return budgetList, 3
+			}
+			budgetList = append(budgetList, name)
+		}
+		rows.Close()
+		db.Close()
 	}
-	rows.Close()
-	db.Close()
 	return budgetList, 0
 }
 
@@ -208,4 +236,29 @@ func payItem(item string, pay int) {
 	db.Close()
 	return
 
+}
+
+func isLate(itemDate int) bool {
+	settings, _ := getSettings()
+	lastPayDate := getLastPayDay(settings)
+	nextPayDate := getNextPayDay()
+	lastArray := strings.Split(lastPayDate, "-")
+	nextArray := strings.Split(nextPayDate, "-")
+	lastPayDay, _ := strconv.Atoi(lastArray[2])
+	nextPayDay, _ := strconv.Atoi(nextArray[2])
+	nowdate := time.Now()
+	nowdateformatted := nowdate.Format("2006-01-02")
+	nowArray := strings.Split(nowdateformatted, "-")
+	today, _ := strconv.Atoi(nowArray[2])
+
+	isLate := false
+
+	if itemDate < today {
+		isLate = true
+	} else if nextPayDay < lastPayDay {
+		if itemDate > nextPayDay && today < nextPayDay {
+			isLate = true
+		}
+	}
+	return isLate
 }
